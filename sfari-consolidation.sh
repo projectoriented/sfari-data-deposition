@@ -41,7 +41,7 @@ do
         echo "Exists, ignoring & regenerating: ${working_dir_md5_filepath}" 1>&2
 
         # if it exists, then re-generate in the working directory
-        echo "cd ${working_directory_prefix} && rm -f ${md5_basename} && md5sum * | sed -i -r 's/(.*)\s+(.*)/\1\t.\/\2/g' > $md5_basename" >> ${current_date}-data-files-to-move_part-3.txt
+        echo "cd ${working_directory_prefix} && rm -f ${md5_basename} && md5sum * | sed -r 's/(.*)\s+(.*)/\1\t.\/\2/g' > $md5_basename" >> ${current_date}-data-files-to-move_part-3.txt
       fi
 
     else
@@ -55,8 +55,8 @@ done
 
 
 # Remove duplicated lines
-cat ${current_date}-data-files-to-move_part-2.txt | sort -u > ${current_date}-data-files-to-move_part_deduplicated-2.txt
-cat ${current_date}-data-files-to-move_part-3.txt | sort -u > ${current_date}-data-files-to-move_part_deduplicated-3.txt
+cat ${current_date}-data-files-to-move_part-2.txt | sort -u > ${current_date}-data-files-to-move_part-2_deduplicated.txt
+cat ${current_date}-data-files-to-move_part-3.txt | sort -u > ${current_date}-data-files-to-move_part-3_deduplicated.txt
 
 # Remove unwanted files
 for idx in $(seq 2 3)
@@ -118,16 +118,17 @@ do
   pseudo=$(echo $s | cut -f1 -d':')
   real=$(echo $s | cut -f2 -d':')
 
-  # First rename the directories.
+  # First move the nanopore away from original directory
   {
-    echo "mv raw_data/${pseudo}/nanopore/STD/bam raw_data/${real}-intermediate/nanopore/STD/bam"
-    echo "mv raw_data/${pseudo}/nanopore/STD/fast5 raw_data/${real}-intermediate/nanopore/STD/fast5"
-    echo "mv fastq_assembly/${pseudo}/nanopore/STD/fastq fastq_assembly/${real}-intermediate/nanopore/STD/fastq"
+    echo "mkdir -p raw_data/${real}-intermediate && mv raw_data/${pseudo}/nanopore raw_data/${real}-intermediate"
+    echo "mkdir -p fastq_assembly/${real}-intermediate && mv fastq_assembly/${pseudo}/nanopore fastq_assembly/${real}-intermediate"
   } >> "${current_date}-data-files-to-move_part-6.txt"
 
   # Then rename the file names.
-#  declare -a files_to_rename=($(find {raw_data,fastq_assembly}/${real}-intermediate/nanopore/STD/{bam,fastq} -type f 2> /dev/null))
-  declare -a files_to_rename=($(find {raw_data,fastq_assembly}/${pseudo}/nanopore/STD/{bam,fastq} -type f 2> /dev/null))
+  declare -a files_to_rename=($(find {raw_data,fastq_assembly}/${real}-intermediate/nanopore/STD/{bam,fastq} -type f 2> /dev/null))
+
+# #The below command is commented out for my own testing purposes- leave commented please.
+#  declare -a files_to_rename=($(find {raw_data,fastq_assembly}/${pseudo}/nanopore/STD/{bam,fastq} -type f 2> /dev/null))
 
   for f in "${files_to_rename[@]}"
   do
@@ -140,11 +141,10 @@ do
     fi
   done
 
-  # Final renaming.
+  # Reunite with the HiFi + genome assemblies.
   {
-    echo "mv raw_data/${real}-intermediate/nanopore/STD/bam raw_data/${real}/nanopore/STD/bam"
-    echo "mv raw_data/${real}-intermediate/nanopore/STD/fast5 raw_data/${real}/nanopore/STD/fast5"
-    echo "mv fastq_assembly/${real}-intermediate/nanopore/STD/fastq fastq_assembly/${real}/nanopore/STD/fastq"
+    echo "mv raw_data/${real}-intermediate/nanopore raw_data/${real}"
+    echo "mv fastq_assembly/${real}-intermediate/nanopore fastq_assembly/${real}"
   } >> "${current_date}-data-files-to-move_part-9.txt"
 
 done
