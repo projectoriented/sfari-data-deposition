@@ -28,3 +28,6 @@ do
 #  done < "${x}"
 done
 ```
+
+#### Discussion
+1. For the sample swap, do you think it's necessary to `samtools reheader` where it applies? Precisely, the nanopore unmapped bams for those files. We can either remove the tags with misleading sample or perform regex in-placement.
