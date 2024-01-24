@@ -31,3 +31,8 @@ done
 
 #### Discussion
 1. For the sample swap, do you think it's necessary to `samtools reheader` where it applies? Precisely, the nanopore unmapped bams for those files. We can either remove the tags with misleading sample or perform regex in-placement.
+   1. We are doing `samtools reheader`.
+      1. According to the samtools docs for reheader, the `in-place` replacement only works for CRAM files. The solution in [bam-reheader script](bam-reheader.sh) will perform the following steps:
+         1. Perform the re-header & output to a different BAM file: `*-data-files-to-move_part-10.txt"`
+         2. Overwrite the original file with the updated one: `*-data-files-to-move_part-11.txt"`
+            1. To make sure overwriting doesn't require the `--force` argument, try this test first: `echo hi > hi.txt && echo bye > bye.txt && mv bye.txt hi.txt`. The resulting hi.txt file should contain `bye`. :tada:
