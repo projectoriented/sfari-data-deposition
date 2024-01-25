@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Usage: bam-reheader.sh
-# Please run this after you have run through sfari-consolidation.
+# Please run this after you have run through sfari-consolidation + continue-sample-swap.sh.
 
 if ! echo $PATH | grep -iq samtools || ! command -v samtools > /dev/null
 then

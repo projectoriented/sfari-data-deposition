@@ -111,7 +111,7 @@ done
 ####################################################
 # 14444_fa(SSC11822) & 14444_mo(SSC11667) swap fix #
 ####################################################
-# Only the nanopore raw data are swapped.
+# Only the nanopore are swapped.
 
 for s in SSC11822:SSC11667 SSC11667:SSC11822
 do
@@ -123,29 +123,5 @@ do
     echo "mkdir -p raw_data/${real}-intermediate && mv raw_data/${pseudo}/nanopore raw_data/${real}-intermediate"
     echo "mkdir -p fastq_assembly/${real}-intermediate && mv fastq_assembly/${pseudo}/nanopore fastq_assembly/${real}-intermediate"
   } >> "${current_date}-data-files-to-move_part-6.txt"
-
-  # Then rename the file names.
-  declare -a files_to_rename=($(find {raw_data,fastq_assembly}/${real}-intermediate/nanopore/STD/{bam,fastq} -type f 2> /dev/null))
-
-# #The below command is commented out for my own testing purposes- leave commented please.
-#  declare -a files_to_rename=($(find {raw_data,fastq_assembly}/${pseudo}/nanopore/STD/{bam,fastq} -type f 2> /dev/null))
-
-  for f in "${files_to_rename[@]}"
-  do
-    if echo $f | grep -q "\.md5"
-    then
-      echo "sed -i 's/${pseudo}/${real}/g' $f" >> "${current_date}-data-files-to-move_part-8.txt"
-    else
-      # Replace all file path names
-      echo "mv ${f} ${f//${pseudo}/${real}}" >> "${current_date}-data-files-to-move_part-7.txt"
-    fi
-  done
-
-  # Reunite with the HiFi + genome assemblies.
-  {
-    echo "mv raw_data/${real}-intermediate/nanopore raw_data/${real}"
-    echo "mv fastq_assembly/${real}-intermediate/nanopore fastq_assembly/${real}"
-  } >> "${current_date}-data-files-to-move_part-9.txt"
-
 done
 
