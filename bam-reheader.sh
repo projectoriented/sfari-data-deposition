@@ -5,6 +5,7 @@
 if ! echo $PATH | grep -iq samtools || ! command -v samtools > /dev/null
 then
   echo "cannot find samtools executable, try again please." 1>&2
+  exit 1
 fi
 
 current_date=$(date +%F)
