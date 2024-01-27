@@ -118,10 +118,21 @@ do
   pseudo=$(echo $s | cut -f1 -d':')
   real=$(echo $s | cut -f2 -d':')
 
+  # check if this source directory exists
+  for src_dir in {raw_data,fastq_assembly}/${pseudo}/nanopore
+  do
+    if [ ! -d $src_dir ]
+    then
+      echo "$src_dir does not exist, which cannot be true." 1>&2
+      exit 1
+    fi
+  done
+
   # First move the nanopore away from original directory
   {
-    echo "mkdir -p raw_data/${real}-intermediate && mv raw_data/${pseudo}/nanopore raw_data/${real}-intermediate"
-    echo "mkdir -p fastq_assembly/${real}-intermediate && mv fastq_assembly/${pseudo}/nanopore fastq_assembly/${real}-intermediate"
+    echo "mkdir -p raw_data/${real}-intermediate && if [ ! -d raw_data/${real}-intermediate ]; then echo \"raw_data/${real}-intermediate\ does not exist\" 1>&2 ; (exit 1); fi && mv raw_data/${pseudo}/nanopore raw_data/${real}-intermediate"
+
+    echo "mkdir -p fastq_assembly/${real}-intermediate && if [ ! -d fastq_assembly/${real}-intermediate ]; then echo \"fastq_assembly/${real}-intermediate\ does not exist\" 1>&2 ; (exit 1); fi && mv fastq_assembly/${pseudo}/nanopore fastq_assembly/${real}-intermediate"
   } >> "${current_date}-data-files-to-move_part-6.txt"
 done
 

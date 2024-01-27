@@ -29,6 +29,6 @@ do
   for b in "${sample_bams[@]}"
   do
     echo "samtools reheader --no-PG -c \"sed 's/${ssc_pseudo}/${ssc_real}/g; s/${internal_pseudo}/${internal_real}/g'\" ${b} > ${b}-reheader" >> "${current_date}-data-files-to-move_part-10.txt"
-    echo "mv ${b}-reheader ${b}" >> "${current_date}-data-files-to-move_part-11.txt"
+    echo "if [ ! -f ${b}-reheader ]; then echo \"${b}-reheader does not exist\" 1>&2; (exit 1); fi && mv ${b}-reheader ${b}" >> "${current_date}-data-files-to-move_part-11.txt"
   done
 done
